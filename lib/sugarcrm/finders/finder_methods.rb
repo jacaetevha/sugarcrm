@@ -2,7 +2,7 @@ module SugarCRM
   def self.slice(size); FinderMethods::ClassMethods.slice_size = size; end
   module FinderMethods
     module ClassMethods
-      def self.slice(size); SLICE_SIZE = size; end
+      def self.slice(size); const_set :SLICE_SIZE, size; end
       private 
         def find_initial(options)
           options.update(:limit => 1)
