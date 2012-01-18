@@ -41,6 +41,15 @@ module SugarCRM
     self.session.connection
   end
   
+  @@batch_size=100
+  def self.batch_size= size
+    @@batch_size = size
+  end
+  
+  def self.batch_size
+    @@batch_size
+  end
+  
   def self.connect(url, user, pass, options={})
     session = SugarCRM::Session.new(url, user, pass, options)
     # return the namespace module

@@ -1,8 +1,6 @@
 module SugarCRM
-  def self.slice(size); FinderMethods::ClassMethods.slice_size = size; end
   module FinderMethods
     module ClassMethods
-      def self.slice(size); const_set :SLICE_SIZE, size; end
       private 
         def find_initial(options)
           options.update(:limit => 1)
@@ -68,10 +66,6 @@ module SugarCRM
         def find_every(options, &block)
           find_by_sql(options, &block)
         end
-      
-        # the number of records we retrieve with each query
-        # it is kept small to avoid timeout issues
-        SLICE_SIZE = 1000
 
         # results accumulator stores the results we have fetched so far, recursively
         def find_by_sql(options, results_accumulator=nil, &block)
@@ -91,10 +85,10 @@ module SugarCRM
         
           # we must ensure limit <= offset (due to bug mentioned above)
           if offset
-            local_options[:limit] = [offset.to_i, SLICE_SIZE].min
+            local_options[:limit] = [offset.to_i, SugarCRM.batch_size].min
             local_options[:offset] = offset if offset
           else
-            local_options[:limit] = options[:limit] ? [options[:limit].to_i, SLICE_SIZE].min : SLICE_SIZE
+            local_options[:limit] = options[:limit] ? [options[:limit].to_i, SugarCRM.batch_size].min : SugarCRM.batch_size
           end
           local_options[:limit] = [local_options[:limit], options[:limit]].min if options[:limit] # don't retrieve more records than required
           local_options = options.merge(local_options)
